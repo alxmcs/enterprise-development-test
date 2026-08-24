@@ -1,0 +1,74 @@
+﻿using BookStore.Domain.Model.BookAuthors;
+using BookStore.Domain.Model.Books;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace BookStore.Domain.Model.Authors;
+
+/// <summary>
+/// Автор
+/// </summary>
+[Table("authors")]
+public class Author
+{
+    /// <summary>
+    /// Идентификатор автора
+    /// </summary>
+    [Key]
+    [Column("id")]
+    public required int Id { get; set; }
+
+    /// <summary>
+    /// Имя автора
+    /// </summary>
+    [StringLength(100, ErrorMessage = "Имя автора не должно превышать 100 символов")]
+    [Column("last_name")]
+    public string? LastName { get; set; }
+
+    /// <summary>
+    /// Фамилия автора
+    /// </summary>
+    [StringLength(100, ErrorMessage = "Фамилия автора не должна превышать 100 символов")]
+    [Column("first_name")]
+    public string? FirstName { get; set; }
+
+    /// <summary>
+    /// Отчество автора
+    /// </summary>
+    [StringLength(100, ErrorMessage = "Отчество автора не должно превышать 100 символов")]
+    [Column("patronymic")]
+    public string? Patronymic { get; set; }
+
+    /// <summary>
+    /// Биография автора
+    /// </summary>
+    [StringLength(int.MaxValue)]
+    [Column("biography")]
+    public string? Biography { get; set; }
+
+    /// <summary>
+    /// Список работ
+    /// </summary>
+    public virtual List<BookAuthor>? BookAuthors { get; set; }
+
+    /// <summary>
+    /// Перегрузка метода, возвращающего строковое представление объекта
+    /// </summary>
+    /// <returns>Имя автора</returns>
+    public override string ToString() =>
+        string.IsNullOrEmpty(Patronymic)
+            ? $"{FirstName} {LastName}"
+            : $"{LastName} {FirstName} {Patronymic}";
+
+    /// <summary>
+    /// Получает последние 5 книг автора
+    /// </summary>
+    /// <returns>Список книг</returns>
+    public List<Book> GetLast5AuthorsBook() => [.. BookAuthors?.Select(ba => ba.Book)?.OrderByDescending(b => b?.Year)?.Take(5) ?? []];
+
+    /// <summary>
+    /// Получает суммарное число изданных автором страниц
+    /// </summary>
+    /// <returns>Число страниц всех изданных книг</returns>
+    public int? GetPageCount() => BookAuthors?.Select(ba => ba.Book).Sum(b => b?.PageCount);
+}
