@@ -38,7 +38,13 @@ jobs:
             exit 1
         fi
         echo Your number was parsed correctly - ${{ env.LABEL }}
-
+        
+     - name: Setting up milestone
+       uses: zoispag/action-assign-milestone@v1
+       with:
+          repo-token: "${{ secrets.GITHUB_TOKEN }}"
+          milestone: '${{ env.LABEL }} deadline'
+          
      - name: Checking your group number
        run: |
         if [[ $GROUP == '' ]]; then
